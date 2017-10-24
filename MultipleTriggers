@@ -1,0 +1,67 @@
+package com.webservice;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.quartz.CronScheduleBuilder;
+import org.quartz.CronTrigger;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SchedulerFactory;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.impl.StdSchedulerFactory;
+
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+
+public class QuartzTestTriggers2 {
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static void main(String[] args) {
+
+		try {
+			System.out.println("当前时间是--->" + new Date()); 
+			CronTrigger trigger = null;
+			CronTrigger trigger1 = null;
+
+			List createdTrigger = new ArrayList();
+			createdTrigger.add("0/7 * 8-23 * * ?");
+			createdTrigger.add("0/3 * 8-23 * * ?");
+
+			String groupName = "GroupName";
+			String jobName = "JobName";
+			JobKey jobKey = new JobKey(jobName, groupName);
+			String triggerName = jobName;
+
+			JobDetail job = JobBuilder.newJob(HelloQuartz1.class).withIdentity(jobKey)
+					.usingJobData("groupName", groupName).usingJobData("jobName", jobName).storeDurably(true).build();
+
+			trigger = (CronTrigger) TriggerBuilder.newTrigger().withIdentity(triggerName + "0", groupName)
+					.withSchedule(CronScheduleBuilder.cronSchedule((String) createdTrigger.get(0))).forJob(job).build();
+
+			trigger1 = (CronTrigger) TriggerBuilder.newTrigger().withIdentity(triggerName + "1", groupName)
+					.withSchedule(CronScheduleBuilder.cronSchedule((String) createdTrigger.get(1))).forJob(job).build();
+
+			Scheduler scheduler = new StdSchedulerFactory().getScheduler();
+
+			scheduler.start();
+			scheduler.addJob(job, true);
+			scheduler.scheduleJob(trigger);
+			scheduler.scheduleJob(trigger1);
+
+		} catch (SchedulerException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+}
