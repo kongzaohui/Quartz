@@ -1,6 +1,6 @@
 # Quartz
 
-```Scheduler scheduler = new StdSchedulerFactory().getScheduler();<br>
+Scheduler scheduler = new StdSchedulerFactory().getScheduler();<br>
 scheduler.start();<br>
 scheduler.scheduleJob(job, trigger);<br>```
   
